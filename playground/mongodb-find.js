@@ -9,10 +9,12 @@ MongoClient.connect(
       console.log('connected to server');
     }
 
+    const _DATA_LIST_ = result => console.log('fetching data', result.text);
+
     db.collection('Todos')
-      .find({ completed: true, text: 'just do' })
+      .find()
       .toArray()
-      .then(res => console.log('fetching data', res))
+      .then(res => res.map(_DATA_LIST_))
       .catch(err => console.log(err));
 
     db.close();

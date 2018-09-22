@@ -26,10 +26,13 @@ MongoClient.connect(
     );
 
     var dataUser = {
-      name: 'Ahmad',
+      name: 'Budi',
       age: 23,
       location: 'Balikpapan',
-      pekerjaan: 'mahasiswa'
+      pekerjaan: {
+        lama: 'programmer',
+        baru: 'softdev'
+      }
     };
 
     const fx = (err, result) => {

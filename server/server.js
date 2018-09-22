@@ -43,6 +43,16 @@ app.post('/perusahaan/post', urlencodedParser, (req, res) => {
     });
 });
 
+app.get('/perusahaan/', (req, res) => {
+  const getData = perusahaanModel.find().then(response => {
+    console.log(response);
+    res.status(200).json({
+      message: 'data fetched',
+      data: response
+    });
+  });
+});
+
 app.listen(3000, res => {
   console.log('connected to server with localhost:', 3000);
 });

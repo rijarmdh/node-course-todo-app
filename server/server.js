@@ -4,17 +4,22 @@ const bodyParser = require('body-parser');
 const { mongoose } = require('./db/mongoose');
 const { userModel } = require('./models/UserModel');
 const { perusahaanModel } = require('./models/PerusahaanModel');
+const { ObjectID } = require('mongoose');
+const _ = require('lodash');
+const port = process.env.PORT || 3000;
 
-app.use(bodyParser.json());
+app.use(bodyParser.json()); //parsing body
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 // app.use(urlencodedParser);
 
+//landing page
 app.get('/', (req, res) => {
   res.status(200).json({
     message: 'this is get status api'
   });
 });
 
+//POST
 app.post('/perusahaan/post', urlencodedParser, (req, res) => {
   console.log(req.body);
   const { body } = req;
@@ -43,6 +48,7 @@ app.post('/perusahaan/post', urlencodedParser, (req, res) => {
     });
 });
 
+//GET LISTS
 app.get('/perusahaan/', (req, res) => {
   const getData = perusahaanModel.find().then(response => {
     console.log(response);
@@ -53,6 +59,85 @@ app.get('/perusahaan/', (req, res) => {
   });
 });
 
-app.listen(3000, res => {
-  console.log('connected to server with localhost:', 3000);
+//GET ONE LIST
+app.get('/perusahaan/:id', (req, res) => {
+  const idPerusahaan = req.params.id;
+  const isIdValid = mongoose.Types.ObjectId.isValid(idPerusahaan); // validating Id
+  console.log(isIdValid);
+
+  if (isIdValid) {
+    perusahaanModel.findById(idPerusahaan).then(result => {
+      res.status(200).json({
+        message: result
+      });
+    });
+  } else {
+    res.status(401).json({
+      message: 'Unauthorized',
+      data: req.params.id
+    });
+  }
+});
+
+app.patch('/perusahaan/:id/update', (req, res) => {
+  const id = req.params.id;
+  const isIdValid = mongoose.Types.ObjectId.isValid(id);
+
+  if (isIdValid) {
+    perusahaanModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            nama: 'ahmad syahriza ramadhan'
+          }
+        },
+        { returnOriginal: false }
+      )
+      .then(response =>
+        res.status(203).json({
+          message: response
+        })
+      )
+      .catch(err => {
+        res.status(400).json({
+          message: err
+        });
+      });
+  } else {
+    res.status(500).json({
+      message: 'cannot find id given'
+    });
+  }
+});
+
+//DELETE
+app.delete('/perusahaan/:id/delete', (req, res) => {
+  const id = req.params.id;
+  const isIdValid = mongoose.Types.ObjectId.isValid(id);
+
+  if (isIdValid) {
+    //findOneAndRemove
+    //findByIdAndRemove
+    perusahaanModel
+      .findByIdAndRemove(id)
+      .then(response => {
+        res.status(200).json({
+          message: response
+        });
+      })
+      .catch(err => {
+        res.status(400).json({
+          message: err
+        });
+      });
+  } else {
+    res.status(200).json({
+      message: 'error occured'
+    });
+  }
+});
+
+app.listen(port, () => {
+  console.log('connected to server with localhost:', port);
 });
